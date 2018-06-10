@@ -1,0 +1,33 @@
+CREATE DATABASE [UploadingFiles];
+USE [UploadingFiles];
+
+CREATE TABLE [UploadingFiles].[dbo].[Files](
+	[Id] INT PRIMARY KEY IDENTITY(1, 1),
+	[Name] VARCHAR(100),
+	[Data] VARCHAR(MAX),
+	[Extension] VARCHAR(50),
+	[Date] DATETIME
+)
+
+CREATE TRIGGER [UploadingFiles].[dbo].[OnInsertFile]
+   ON  [UploadingFiles].[dbo].[Files]
+   INSTEAD OF INSERT
+AS 
+BEGIN
+	DECLARE 
+	@Name VARCHAR(100),
+	@Data VARCHAR(MAX),
+	@Extension VARCHAR(50),
+	@Date DATETIME;
+
+	SET @Name = (SELECT [Name] FROM INSERTED);
+	SET @Data = (SELECT [Data] FROM INSERTED);
+	SET @Extension = (SELECT [Extension] FROM INSERTED);
+	SET @Date = (SELECT [Date] FROM INSERTED);
+
+	INSERT INTO [UploadingFiles].[dbo].[Files]
+	VALUES(@Name, @Data, @Extension, @Date);
+
+	SELECT SCOPE_IDENTITY() AS Id;
+END
+GO
